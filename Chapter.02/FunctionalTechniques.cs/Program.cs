@@ -2,7 +2,7 @@
 
 namespace FunctionalTechniques.cs
 {
-    class Program
+    internal class Program
     {
         // Listing 2.14 Greeting example in C#
         public static string Greeting(string name)
@@ -29,24 +29,25 @@ namespace FunctionalTechniques.cs
             Console.WriteLine(greetingMemoize("Richard"));  //#B
         }
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-            Closure closure = new Closure();
-            closure.Closure_Strange_Behavior();
-            Demo.PrintSeparator();
-            closure.Closure_Correct_Behavior();
-            Demo.PrintSeparator();
+            //Closure closure = new Closure();
+            //closure.Closure_Strange_Behavior();
+            //Demo.PrintSeparator();
+            //closure.Closure_Correct_Behavior();
+            //Demo.PrintSeparator();
 
-            RunDemoMemoization();
-            Demo.PrintSeparator();
+            //RunDemoMemoization();
+            //Demo.PrintSeparator();
 
             WebCrawlerExample.RunDemo();
-            Demo.PrintSeparator();
+            Console.ReadLine();
+            //Demo.PrintSeparator();
 
-            ConcurrentSpeculation.FuzzyMatchDemo();
-            Demo.PrintSeparator();
+            //ConcurrentSpeculation.FuzzyMatchDemo();
+            //Demo.PrintSeparator();
 
-            Person.RunDemo();
+            //Person.RunDemo();
         }
     }
 }

@@ -17,32 +17,55 @@ namespace FunctionalTechniques.cs
         public static Func<string, IEnumerable<string>> WebCrawlerMemoizedThreadSafe =
             Memoization.MemoizeThreadSafe<string, IEnumerable<string>>(WebCrawler);
 
+        // Listing 2.21 Thread-safe memoization function with lazy
+        public static Func<string, IEnumerable<string>> WebCrawlerMemoizedLazyThreadSafe =
+            Memoization.MemoizeLazyThreadSafe<string, IEnumerable<string>>(WebCrawler);
+
         public static IEnumerable<string> WebCrawler(string url) //#A
         {
             string content = GetWebContent(url);
             yield return content;
 
             foreach (string item in AnalyzeHtmlContent(content))
+            {
                 yield return GetWebContent(item);
+            }
         }
+
         private static string GetWebContent(string url)
         {
-            using (var wc = new WebClient())
-                return wc.DownloadString(new Uri(url));
+            try
+            {
+                using (var wc = new WebClient())
+                {
+                    return wc.DownloadString(new Uri(url));
+                }
+            }
+            catch (Exception)
+            {
+                return "empty";
+            }
         }
 
         private static readonly Regex regexLink = new Regex(@"(?<=href=('|""))https?://.*?(?=\1)");
+
         private static IEnumerable<string> AnalyzeHtmlContent(string text)
         {
             foreach (var url in regexLink.Matches(text))
+            {
                 yield return url.ToString();
+            }
         }
 
         private static readonly Regex regexTitle = new Regex("<title>(?<title>.*?)<\\/title>", RegexOptions.Compiled);
+
         public static string ExtractWebPageTitle(string textPage) //#D
         {
             if (regexTitle.IsMatch(textPage))
+            {
                 return regexTitle.Match(textPage).Groups["title"].Value;
+            }
+
             return "No Page Title Found!";
         }
 
@@ -90,7 +113,15 @@ namespace FunctionalTechniques.cs
 
                 Console.WriteLine($"Crawled {webPageTitles.Count()} page titles");
             });
+
+            Demo.Benchmark("Listing 2.21 Thread-Safe Memoization function with safe lazy evaluation", () =>
+            {
+                var webPageTitles = from url in urls.AsParallel()
+                                    from pageContent in WebCrawlerMemoizedLazyThreadSafe(url) //#B
+                                    select ExtractWebPageTitle(pageContent);  //#C
+
+                Console.WriteLine($"Crawled {webPageTitles.Count()} page titles");
+            });
         }
     }
 }
-
